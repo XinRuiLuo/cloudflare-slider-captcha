@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cloudflare-slider-captcha · demo</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center;
+    background: #071910; color: #dbeed0;
+    font-family: system-ui, "Microsoft YaHei", sans-serif;
+  }
+  .card {
+    width: min(420px, 92vw); padding: 24px;
+    background: #0b2417; border: 1px solid #bde3a544; border-radius: 14px;
+  }
+  h1 { margin: 0 0 4px; font-size: 18px; }
+  p.sub { margin: 0 0 18px; font-size: 12.5px; color: #87a28b; }
+  button {
+    width: 100%; margin-top: 16px; padding: 11px; cursor: pointer;
+    border: 0; border-radius: 10px; background: #a9d875; color: #17321d;
+    font-size: 14px; font-weight: 700;
+  }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  #result { margin-top: 12px; font-size: 12.5px; min-height: 18px; }
+</style>
+</head>
+<body>
+  <main class="card">
+    <h1>cloudflare-slider-captcha</h1>
+    <p class="sub">自托管拼图验证码演示 · self-hosted slider CAPTCHA demo</p>
+
+    <!-- 页面内任意位置放一个容器即可 -->
+    <div class="forest-captcha" data-forest-captcha data-action="demo"></div>
+
+    <button id="submit" type="button" disabled>提交 / Submit</button>
+    <div id="result"></div>
+  </main>
+
+  <script src="/captcha.js?v=1.9.3"></script>
+  <script>
+    const container = document.querySelector('[data-forest-captcha]');
+    const captcha = window.ForestCaptcha.get(container);
+    const submitBtn = document.getElementById('submit');
+    const resultEl = document.getElementById('result');
+
+    // 验证通过后放开提交按钮
+    container.addEventListener('forest-captcha-solved', () => {
+      submitBtn.disabled = false;
+      resultEl.textContent = '';
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const captchaToken = captcha ? captcha.ticket() : '';
+      if (!captchaToken) {
+        resultEl.textContent = '请先完成人机验证 / Please solve the CAPTCHA first';
+        return;
+      }
+      submitBtn.disabled = true;
+      try {
+        const response = await fetch('/api/demo/submit', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ captchaToken })
+        });
+        const data = await response.json().catch(() => ({}));
+        resultEl.textContent = response.ok
+          ? (data.message || '成功 / OK')
+          : (data.error || '失败 / Failed');
+      } catch (error) {
+        resultEl.textContent = '网络异常 / Network error';
+      } finally {
+        // ticket 已消费，换一道新题
+        if (captcha) captcha.reset();
+        submitBtn.disabled = true;
+      }
+    });
+  </script>
+</body>
+</html>

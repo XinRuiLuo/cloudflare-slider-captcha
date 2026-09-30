@@ -1,0 +1,26 @@
+{
+  "name": "cloudflare-slider-captcha",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Self-hosted slider (jigsaw gap) CAPTCHA for Cloudflare Pages + D1. No third-party service, no API key.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev",
+    "db:init:local": "wrangler d1 execute captcha-db --local --file=./schema.sql",
+    "db:init:remote": "wrangler d1 execute captcha-db --remote --file=./schema.sql",
+    "deploy": "wrangler pages deploy"
+  },
+  "keywords": [
+    "captcha",
+    "cloudflare",
+    "cloudflare-pages",
+    "cloudflare-workers",
+    "d1",
+    "slider-captcha",
+    "puzzle-captcha"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.78.0"
+  }
+}

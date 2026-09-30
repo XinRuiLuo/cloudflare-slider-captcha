@@ -1,0 +1,18 @@
+# cloudflare-slider-captcha · Cloudflare Pages 配置
+# 文档：https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+
+name = "cloudflare-slider-captcha"
+
+# Workers 运行时 API 版本
+compatibility_date = "2024-01-01"
+
+# 静态资源目录（captcha.js 与演示页直接来源于此，无需构建）
+pages_build_output_dir = "public"
+
+# D1 数据库绑定
+# 先执行 `npx wrangler d1 create captcha-db`，把返回的 database_id 填到下面，
+# 再执行 `npx wrangler d1 execute captcha-db --remote --file=./schema.sql` 建表。
+[[d1_databases]]
+binding = "DB"
+database_name = "captcha-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
